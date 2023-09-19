@@ -95,14 +95,14 @@ class JunitTestStudent {
         // Verify that the return status for the POST request is OK (value 200)
         assertEquals(200, response.getStatus());
 
-        // Now, make a GET request to fetch the student by ID
+        // GET request to fetch the student by ID and we add the ID to the URL
         response = mvc.perform(
                 MockMvcRequestBuilders
                         .get("/students?student_id=" + student.getStudent_id())
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        // Verify that the return status for the GET request is OK (value 200)
+        // Verify that the return status for the GET request is 200
         assertEquals(200, response.getStatus());
 
     }
@@ -117,7 +117,7 @@ class JunitTestStudent {
         student.setStatusCode(0);
         student.setStatus(null);
 
-        // Convert the Student object to JSON
+        // convert the student to JSON
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(student);
 
@@ -130,22 +130,22 @@ class JunitTestStudent {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        // Verify that the return status for the POST request is OK (value 200)
+        // Verify that the return status for the GET request is 200
         assertEquals(200, response.getStatus());
 
-        // Now, make a GET request to fetch the student by ID
+        // we use a git request to get the student by the ID
         response = mvc.perform(
                 MockMvcRequestBuilders
                         .get("/students?student_id=" + student.getStudent_id())
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        // Verify that the return status for the GET request is OK (value 200)
+        // Verify that the return status for the GET request is 200
         assertEquals(200, response.getStatus());
     }
     @Test
     void testUpdateStudent() throws Exception {
-        // Add a new student
+        // Add a new test student
         Student student = new Student();
         student.setStudent_id(3);
         student.setName("Kylee Song");
@@ -153,11 +153,11 @@ class JunitTestStudent {
         student.setStatusCode(0);
         student.setStatus(null);
 
-        // Convert the Student object to JSON
+        // convert the object to JSON
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(student);
 
-        // POST request to add a new student
+        // use a POST request to update the student
         MockHttpServletResponse response = mvc.perform(
                 MockMvcRequestBuilders
                         .post("/students")
@@ -166,19 +166,19 @@ class JunitTestStudent {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        // Verify that the return status for the POST request is OK (value 200)
+        // check that response status is 200
         assertEquals(200, response.getStatus());
 
-        // Now, make a PUT request to update the student's information
-        String updatedRequestBody = "{" +
-                "\"student_id\": 3," +
-                "\"name\": \"Kylee Smiley\"," +
-                "\"email\": \"kyleesmiley@csumb.edu\"," +
-                "\"statusCode\": 0," +
-                "\"status\": null" +
-                "}";
+     
+        student.setStudent_id(3);
+        student.setName("Kylee Smiley");
+        student.setEmail("kyleesmiley@csumb.edu");
+        student.setStatusCode(0);
+        student.setStatus(null);
 
-        // PUT request to update the student
+        String updatedRequestBody = objectMapper.writeValueAsString(student);
+
+        // Use a put request to update the student
         response = mvc.perform(
                 MockMvcRequestBuilders
                         .put("/students/{studentId}", student.getStudent_id())
@@ -187,18 +187,16 @@ class JunitTestStudent {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        // Verify that the return status for the PUT request is OK (value 200)
-        assertEquals(200, response.getStatus());
 
-        // Parse the JSON response
+        // get the JSON response
         String jsonResponse = response.getContentAsString();
         ObjectMapper responseMapper = new ObjectMapper();
         Student updatedStudent = responseMapper.readValue(jsonResponse, Student.class);
 
-        // Use getters to extract actual values
+//use getter to get the updated name
         String actualName = updatedStudent.getName();
 
-        // Assert that the actual name matches the updated name
+        // Assert that the actual name matches the updated name - "Kylee Smiley"
         assertEquals("Kylee Smiley", actualName);
     }
     @Test
@@ -211,11 +209,11 @@ class JunitTestStudent {
         student.setStatusCode(0);
         student.setStatus(null);
 
-        // Convert the Student object to JSON
+        // convert the student to an object 
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody = objectMapper.writeValueAsString(student);
 
-        // POST request to add the student
+        // use post request
         MockHttpServletResponse response = mvc.perform(
                 MockMvcRequestBuilders
                         .post("/students")
@@ -224,22 +222,22 @@ class JunitTestStudent {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        // Verify that the return status for the POST request is OK (value 200)
+//verify status 
         assertEquals(200, response.getStatus());
 
-        // Now, make a DELETE request to remove the student
+//use delete to remove student        
         response = mvc.perform(
                 MockMvcRequestBuilders
                         .delete("/students/{studentId}", student.getStudent_id())
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        // Verify that the return status for the DELETE request is OK (value 200)
+//verify the response status        
         assertEquals(200, response.getStatus());
     }
     @Test
     void testGetAllStudents() throws Exception {
-        // Add one or more students (you can add more students if needed)
+        // adding another test student
         Student student = new Student();
         student.setStudent_id(6);
         student.setName("Clownita Clown");
@@ -247,11 +245,11 @@ class JunitTestStudent {
         student.setStatusCode(0);
         student.setStatus(null);
 
-        // Convert the Student object to JSON
+        // Convert the Student to a JSON
         ObjectMapper objectMapper = new ObjectMapper();
         String requestBody1 = objectMapper.writeValueAsString(student);
 
-        // POST request to add the first student
+        // add the another student
         MockHttpServletResponse response1 = mvc.perform(
                 MockMvcRequestBuilders
                         .post("/students")
@@ -260,19 +258,19 @@ class JunitTestStudent {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        // Verify that the return status for the first POST request is OK (value 200)
+        // verify the response status
         assertEquals(200, response1.getStatus());
 
      
 
-        // Now, make a GET request to retrieve a list of all students
+        // GET- a list of all the student
         MockHttpServletResponse getAllResponse = mvc.perform(
                 MockMvcRequestBuilders
                         .get("/students")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        // Verify that the return status for the GET request is OK (value 200)
+        //double checking the reponse status 
         assertEquals(200, getAllResponse.getStatus());
 
     }
