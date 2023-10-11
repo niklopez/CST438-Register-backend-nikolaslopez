@@ -1,4 +1,6 @@
 package com.cst438.service;
+import com.cst438.domain.FinalGradeDTO;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,24 +28,34 @@ public class GradebookServiceREST implements GradebookService {
 	@Value("${gradebook.url}")
 	private static String gradebook_url;
 
+	public GradebookServiceREST() {
+		System.out.println("REST grade book service");
+	}
+
 	@Override
 	public void enrollStudent(String student_email, String student_name, int course_id) {
-		System.out.println("Start Message "+ student_email +" " + course_id); 
-	
-		// TODO use RestTemplate to send message to gradebook service
+		EnrollmentDTO newDTO = new EnrollmentDTO(course_id, student_email, student_name, course_id);
+		
+		restTemplate.postForEntity(gradebook_url+"/enrollment", newDTO, EnrollmentDTO.class);
 		
 	}
 	
-	@Autowired
-	EnrollmentRepository enrollmentRepository;
-	/*
-	 * endpoint for final course grades
-	 */
-	@PutMapping("/course/{course_id}")
-	@Transactional
-	public void updateCourseGrades( @RequestBody FinalGradeDTO[] grades, @PathVariable("course_id") int course_id) {
-		System.out.println("Grades received "+grades.length);
-		
-		//TODO update grades in enrollment records with grades received from gradebook service
+	 @Autowired
+	    EnrollmentRepository enrollmentRepository;
+
+	    /*
+	     * endpoint for final course grades
+	     */
+	    @PutMapping("/course/{course_id}")
+	    @Transactional
+	    public void updateCourseGrades(@RequestBody FinalGradeDTO[] grades, @PathVariable("course_id") int course_id) {
+	        System.out.println("Grades received " + grades.length);
+
+	        for (FinalGradeDTO gradeDTO : grades) {
+	            Enrollment enrollment = enrollmentRepository.findByEmailAndCourseId(gradeDTO.studentEmail(), course_id);
+	                enrollment.setCourseGrade(gradeDTO.grade());
+	                enrollmentRepository.save(enrollment); // Save the updated enrollment record
+	            
+	        }
+	    }
 	}
-}
