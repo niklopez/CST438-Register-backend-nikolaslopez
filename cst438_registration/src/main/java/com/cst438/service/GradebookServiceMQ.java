@@ -14,6 +14,12 @@ import com.cst438.domain.Enrollment;
 import com.cst438.domain.EnrollmentDTO;
 import com.cst438.domain.EnrollmentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.cst438.domain.Course;
+import com.cst438.domain.CourseDTO;
+import com.cst438.domain.Student;
+import com.cst438.domain.StudentRepository;
+
+
 
 @Service
 @ConditionalOnProperty(prefix = "gradebook", name = "service", havingValue = "mq")
@@ -24,32 +30,35 @@ public class GradebookServiceMQ implements GradebookService {
 	
 	@Autowired
 	EnrollmentRepository enrollmentRepository;
+	@Autowired
+    StudentRepository studentRepository;
+
 	
 	Queue gradebookQueue = new Queue("gradebook-queue", true);
 
+	 
+
 	// send message to grade book service about new student enrollment in course
 	@Override
-	public void enrollStudent(String student_email, String student_name, int course_id) {
-		System.out.println("Start Message "+ student_email +" " + course_id); 
-		// create EnrollmentDTO, convert to JSON string and send to gradebookQueue
-		// TODO
+	public void enrollStudent(String student_email, String student_name, int course_id ) {
+        Student student = studentRepository.findByEmail(student_email);
+		EnrollmentDTO enrollDTO = new EnrollmentDTO(student.getStudent_id(), student_email, student_name,course_id);
+	    String jsonEnrollment = asJsonString(enrollDTO);
+	    this.rabbitTemplate.convertAndSend(gradebookQueue.getName(), jsonEnrollment);
 	}
+
 	
 	@RabbitListener(queues = "registration-queue")
 	@Transactional
 	public void receive(String message) {
-		System.out.println("Receive grades :" + message);
-		/*
-		 * for each student grade in courseDTOG,  find the student enrollment 
-		 * entity and update the grade.
-		 */
+        CourseDTO courseDTO = fromJsonString(message, CourseDTO.class);
 		
-		// deserialize the string message to FinalGradeDTO[] 
+		for(CourseDTO.GradeDTO g : courseDTO.grades) {         
+			Enrollment tEnrollment = enrollmentRepository.findByEmailAndCourseId(g.student_email, courseDTO.course_id);
+			tEnrollment.setCourseGrade(g.grade);
+      }
 		
-		// TODO
-
 	}
-	
 	private static String asJsonString(final Object obj) {
 		try {
 			return new ObjectMapper().writeValueAsString(obj);
@@ -65,4 +74,7 @@ public class GradebookServiceMQ implements GradebookService {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	
+
 }
