@@ -1,6 +1,6 @@
 package com.cst438.service;
 import com.cst438.domain.FinalGradeDTO;
-
+import com.cst438.domain.Student;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +17,12 @@ import com.cst438.domain.FinalGradeDTO;
 import com.cst438.domain.Enrollment;
 import com.cst438.domain.EnrollmentDTO;
 import com.cst438.domain.EnrollmentRepository;
+import com.cst438.domain.StudentRepository;
+
 
 @Service
 @ConditionalOnProperty(prefix = "gradebook", name = "service", havingValue = "rest")
+
 @RestController
 public class GradebookServiceREST implements GradebookService {
 
@@ -31,10 +34,14 @@ public class GradebookServiceREST implements GradebookService {
 	public GradebookServiceREST() {
 		System.out.println("REST grade book service");
 	}
+	@Autowired
+	private StudentRepository studentRepository;
+
 
 	@Override
 	public void enrollStudent(String student_email, String student_name, int course_id) {
-		EnrollmentDTO newDTO = new EnrollmentDTO(course_id, student_email, student_name, course_id);
+        Student student = studentRepository.findByEmail(student_email);
+		EnrollmentDTO newDTO = new EnrollmentDTO(student.getStudent_id(), student_email, student_name, course_id);
 		
 		restTemplate.postForEntity(gradebook_url+"/enrollment", newDTO, EnrollmentDTO.class);
 		
@@ -51,11 +58,11 @@ public class GradebookServiceREST implements GradebookService {
 	    public void updateCourseGrades(@RequestBody FinalGradeDTO[] grades, @PathVariable("course_id") int course_id) {
 	        System.out.println("Grades received " + grades.length);
 
-	        for (FinalGradeDTO gradeDTO : grades) {
+	        for (int i = 0; i < grades.length; i++) {
+	            FinalGradeDTO gradeDTO = grades[i];
 	            Enrollment enrollment = enrollmentRepository.findByEmailAndCourseId(gradeDTO.studentEmail(), course_id);
-	                enrollment.setCourseGrade(gradeDTO.grade());
-	                enrollmentRepository.save(enrollment); // Save the updated enrollment record
-	            
-	        }
+	            enrollment.setCourseGrade(gradeDTO.grade());
+	            enrollmentRepository.save(enrollment); 
+
 	    }
 	}

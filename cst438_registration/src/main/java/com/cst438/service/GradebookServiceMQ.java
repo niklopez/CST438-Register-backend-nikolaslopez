@@ -16,6 +16,8 @@ import com.cst438.domain.EnrollmentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.cst438.domain.Course;
 import com.cst438.domain.CourseDTO;
+import com.cst438.domain.Student;
+import com.cst438.domain.StudentRepository;
 
 
 
@@ -28,6 +30,9 @@ public class GradebookServiceMQ implements GradebookService {
 	
 	@Autowired
 	EnrollmentRepository enrollmentRepository;
+	@Autowired
+    StudentRepository studentRepository;
+
 	
 	Queue gradebookQueue = new Queue("gradebook-queue", true);
 
@@ -35,8 +40,9 @@ public class GradebookServiceMQ implements GradebookService {
 
 	// send message to grade book service about new student enrollment in course
 	@Override
-	public void enrollStudent(String student_email, String student_name, int course_id) {
-	    EnrollmentDTO enrollDTO = new EnrollmentDTO(course_id, student_email, student_name, course_id);
+	public void enrollStudent(String student_email, String student_name, int course_id ) {
+        Student student = studentRepository.findByEmail(student_email);
+		EnrollmentDTO enrollDTO = new EnrollmentDTO(student.getStudent_id(), student_email, student_name,course_id);
 	    String jsonEnrollment = asJsonString(enrollDTO);
 	    this.rabbitTemplate.convertAndSend(gradebookQueue.getName(), jsonEnrollment);
 	}
@@ -44,7 +50,8 @@ public class GradebookServiceMQ implements GradebookService {
 	
 	@RabbitListener(queues = "registration-queue")
 	@Transactional
-	public void receive(CourseDTO courseDTO) {
+	public void receive(String message) {
+        CourseDTO courseDTO = fromJsonString(message, CourseDTO.class);
 		
 		for(CourseDTO.GradeDTO g : courseDTO.grades) {         
 			Enrollment tEnrollment = enrollmentRepository.findByEmailAndCourseId(g.student_email, courseDTO.course_id);
