@@ -27,13 +27,13 @@ insert into enrollment values
 
 -- Assignment 
 -- Insert assignments for course 40443
-INSERT INTO assignment (due_date, name, course_id)
-VALUES ('2021-10-10', 'Assignment 1', 40443),
-       ('2021-10-15', 'Assignment 1r', 40443);
-       -- Assign scores to students for assignments
+-- INSERT INTO assignment (due_date, name, course_id)
+-- VALUES ('2021-10-10', 'Assignment 1', 40443),
+--        ('2021-10-15', 'Assignment 1r', 40443);
+--        -- Assign scores to students for assignments
 
-INSERT INTO assignment_grade (score, assignment_id, enrollment_id)
-VALUES (60, 1, 6), -- Score 85 for Assignment 1 (enrollment_id 6 corresponds to 'tom')
-       (50, 2, 6), -- Score 90 for Assignment 2 (enrollment_id 6 corresponds to 'tom')
-       (92, 1, 7), -- Score 92 for Assignment 1 (enrollment_id 7 corresponds to 'test')
-       (100, 2, 7); -- Score 88 for Assignment 2 (enrollment_id 7 corresponds to 'test')
+-- INSERT INTO assignment_grade (score, assignment_id, enrollment_id)
+-- VALUES (60, 1, 6), -- Score 85 for Assignment 1 (enrollment_id 6 corresponds to 'tom')
+--        (50, 2, 6), -- Score 90 for Assignment 2 (enrollment_id 6 corresponds to 'tom')
+--        (92, 1, 7), -- Score 92 for Assignment 1 (enrollment_id 7 corresponds to 'test')
+--        (100, 2, 7); -- Score 88 for Assignment 2 (enrollment_id 7 corresponds to 'test')
