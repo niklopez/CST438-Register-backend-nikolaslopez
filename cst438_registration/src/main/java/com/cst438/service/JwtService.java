@@ -15,9 +15,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtService {
-    private static final String SECRET_KEY = "your-secret-key-here"; // Replace with your secret key
-    private static final String PREFIX = "Bearer ";
-    private static final long EXPIRATIONTIME = 864_000_000; // 10 days in milliseconds
+    private static final String SECRET_KEY = "password";
+    private static final String PREFIX = "test ";
+    private static final long EXPIRATIONTIME = 864_000_000; 
 
     private static final Key key = new SecretKeySpec(DatatypeConverter.parseBase64Binary(SECRET_KEY), SignatureAlgorithm.HS256.getJcaName());
 
