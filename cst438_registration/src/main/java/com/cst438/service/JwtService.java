@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtService {
-    private static final String SECRET_KEY = "password";
-    private static final String PREFIX = "test ";
+	static final String PREFIX = "Bearer";
     private static final long EXPIRATIONTIME = 864_000_000; 
 
-    private static final Key key = new SecretKeySpec(DatatypeConverter.parseBase64Binary(SECRET_KEY), SignatureAlgorithm.HS256.getJcaName());
+	static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     public String getToken(String username) {
         String token = Jwts.builder()
